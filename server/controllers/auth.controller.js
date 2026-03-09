@@ -112,8 +112,20 @@ export const RegenerateAccessTokenController = AsyncHandler(async (req, res) => 
         throw new ApiError(401,"Unauthorized Request.Refresh Token missing.");
     }
     try {
-        const decoded = await jwt
+        const decodedToken =jwt.verify(incomingRefreshToken,process.env.REFRESH_TOKEN_SECRET);
+        const user = await User.findById(decodedToken?._id);
+        if(!user){
+            throw new ApiError(401,"Invalid refresh token")
+        }
+        if(incomingRefreshToken !== user?.refreshToken){
+            throw new ApiError(401,'Refresh Token is expired or used.')
+        }
+        const {accessToken,refreshToken} = await GenerateToken(user._id)
+
+        return res
+        .json(new ApiResponse(200,{accessToken,refreshToken},"AccessToken refreshed"))
+
     } catch (error) {
-        
+        throw new ApiError(401,error.message);
     }
 })
