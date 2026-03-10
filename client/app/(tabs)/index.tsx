@@ -2,14 +2,14 @@ import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import Screen from '@/components/Screen'
 
-const Home = () => {
+const Index = () => {
   return (
     <Screen>
-      <Text>Home</Text>
+      <Text style={{color:'blue',textAlign:'center'}}>Home</Text>
     </Screen>
   )
 }
 
-export default Home
+export default Index
 
 const styles = StyleSheet.create({})
