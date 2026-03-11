@@ -42,7 +42,6 @@ const userSchema = new mongoose.Schema(
         phone: {
             type: String,
             trim: true,
-            unique:true,
             match: [/^[0-9]{10}$/, "Please enter a valid 10-digit phone number"]
         },
         avatar: {

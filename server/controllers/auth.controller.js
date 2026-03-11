@@ -58,7 +58,7 @@ export const RegisterController = AsyncHandler(async (req, res) => {
         email: email.toLowerCase().trim(),
         password,
         gender: gender.toLowerCase(),
-        dateOfBirth,
+        dateOfBirth:dateOfBirth?dateOfBirth:undefined,
         country: country ? country.trim() : undefined,
         state: state ? state.trim() : undefined,
         phone: phone ? phone.trim() : undefined

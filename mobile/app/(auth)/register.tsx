@@ -1,22 +1,22 @@
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native'
-import React, { useContext, useState } from 'react'
-import Screen from '@/components/Screen'
-import InputBox from '@/components/form/InputBox'
-import SelectBox from '@/components/form/SelectBox'
-import DatePicker from '@/components/form/DatePicker'
-import RadioGroup from '@/components/form/RadioGroup'
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React, { useState } from 'react'
+
+import InputBox from '@/components/InputBox'
+import SelectBox from '@/components/SelectBox'
+import DatePicker from '@/components/DatePicker'
+import RadioGroup from '@/components/RadioGroup'
+import Screen from '@/components/Screent'
 import { countryOptions, stateOptions } from '@/constants/locationOptions'
-import { Link, useRouter } from "expo-router";
-import { RegisterUser } from '@/services/authService'
-import { SaveTokens} from '@/utils/storage'
-import { AuthContext } from '@/context/AuthContext'
-import { setAuthToken } from '@/services/api'
+import { Link } from 'expo-router'
+import { useContext } from "react"
+import { router } from "expo-router"
+import { AuthContext } from '@/context/authContext'
+import { saveAuthData } from '@/utils/storage'
+import { RegisterUser } from '@/services/authApi'
 
-const SignUp = () => {
 
-  const { setUser } = useContext(AuthContext)
-  const router = useRouter();
 
+const Register = () => {
   const [name, setName] = useState<string>('')
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
@@ -26,6 +26,8 @@ const SignUp = () => {
   const [state, setState] = useState<string>('')
   const [phone, setPhone] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
+
+  const { setUser } = useContext(AuthContext)
 
   const handleRegister = async () => {
     if (!name || !email || !password || !gender) {
@@ -46,11 +48,10 @@ const SignUp = () => {
       })
       const { user, accessToken, refreshToken } = response.data.data
       const message = response.data.message
+      await saveAuthData(accessToken, refreshToken, user)
       setUser(user)
-      await SaveTokens(accessToken, refreshToken)
-      setAuthToken(accessToken); 
-      router.replace('/(tabs)/Index');
       alert(message)
+      router.replace("/(tabs)")
 
     } catch (error: any) {
       const message = error?.response?.data?.message || "Registration failed"
@@ -153,7 +154,7 @@ const SignUp = () => {
         <TouchableOpacity style={styles.submitbtn} onPress={handleRegister} >
           <Text style={styles.registertxt} >{loading ? "wait..." : 'Register'}</Text>
         </TouchableOpacity>
-        <Link href="/SignIn" style={styles.btmtxt} >
+        <Link href="/login" style={styles.btmtxt} >
           Already have an account ?<Text style={{ color: '#068ad1', fontWeight: '700' }}> Sign In</Text>
         </Link>
       </ScrollView>
@@ -162,10 +163,9 @@ const SignUp = () => {
   )
 }
 
-export default SignUp
+export default Register
 
 const styles = StyleSheet.create({
-
   container: {
     padding: 20,
     paddingBottom: 40
