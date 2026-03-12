@@ -121,7 +121,6 @@ export const RegenerateAccessTokenController = AsyncHandler(async (req, res) => 
             throw new ApiError(401,'Refresh Token is expired or used.')
         }
         const {accessToken,refreshToken} = await GenerateToken(user._id)
-
         return res
         .json(new ApiResponse(200,{accessToken,refreshToken},"AccessToken refreshed"))
 

@@ -12,11 +12,15 @@ import { useContext } from "react"
 import { router } from "expo-router"
 import { AuthContext } from '@/context/authContext'
 import { RegisterUser } from '@/services/authApi'
-import { getTokens } from '@/utils/storage'
+import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+
 
 
 
 const Register = () => {
+    const { setUser } = useContext(AuthContext)
+
   const [name, setName] = useState<string>('')
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
@@ -26,8 +30,20 @@ const Register = () => {
   const [state, setState] = useState<string>('')
   const [phone, setPhone] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
+  const [avatar, setAvatar] = useState<any>(null);
 
-  const { setUser } = useContext(AuthContext)
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: false,
+      quality: 0.7,
+    });
+
+    if (!result.canceled) {
+      setAvatar(result.assets[0]);
+    }
+  };
+
 
   const handleRegister = async () => {
     if (!name || !email || !password || !gender) {
@@ -45,7 +61,7 @@ const Register = () => {
         country: country || null,
         state: state || null,
         phone: phone || null
-      })
+      }, avatar)
       setUser(res.data.user)
       alert(res.message)
       router.replace("/(tabs)")
@@ -153,9 +169,16 @@ const Register = () => {
           />
 
         </View>
+        <TouchableOpacity
+          style={styles.uploadBtn} onPress={pickImage} >
+          <Ionicons name="camera-outline" size={20} color="#fff" />
+          <Text style={styles.uploadBtnText}>{avatar?"attached..":"choose avatar"}</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity style={styles.submitbtn} onPress={handleRegister} >
           <Text style={styles.registertxt} >{loading ? "wait..." : 'Register'}</Text>
         </TouchableOpacity>
+
         <Link href="/login" style={styles.btmtxt} >
           Already have an account ?<Text style={{ color: '#068ad1', fontWeight: '700' }}> Sign In</Text>
         </Link>
@@ -169,8 +192,7 @@ export default Register
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    paddingBottom: 40
+    paddingHorizontal: 20,
   },
 
   header: {
@@ -220,5 +242,21 @@ const styles = StyleSheet.create({
   },
   btmtxt: {
     textAlign: 'center'
-  }
+  },
+  uploadBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#068ad1', // match your theme
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+    marginVertical: 10,
+  },
+  uploadBtnText: {
+    color: '#fff',
+    fontWeight: '700',
+    marginLeft: 8,
+    fontSize: 14,
+  },
 })

@@ -7,70 +7,48 @@ const axiosInstance = axios.create({
   baseURL: BASE_URL
 })
 
-// Attach access token
-axiosInstance.interceptors.request.use(async (config) => {
-  const { accessToken } = await getTokens()
-
-  if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`
-  }
-
-  return config
-})
-
-// Handle token refresh
+// Attach access token and handle refresh
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
+    const originalRequest: any = error.config;
 
-    const originalRequest: any = error.config
-
+    // Only retry once for 401 errors, skip login/register routes
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
       !originalRequest.url.includes("/auth/login") &&
       !originalRequest.url.includes("/auth/register")
     ) {
-
-      originalRequest._retry = true
+      originalRequest._retry = true;
 
       try {
+        const { refreshToken } = await getTokens();
+        if (!refreshToken) throw new Error("No refresh token available");
 
-        const { refreshToken } = await getTokens()
+        // Call regenerate endpoint
+        const res = await axiosInstance.get("/auth/regenerate-access-token", {
+          headers: { Authorization: `Bearer ${refreshToken}` },
+        });
 
-        if (!refreshToken) throw new Error("No refresh token")
+        const { accessToken: newAccessToken, refreshToken: newRefreshToken } = res.data.data;
 
-        // 🔹 Call correct endpoint
-        const res = await axios.get(
-          `${BASE_URL}/regenerate-access-token`,
-          {
-            headers: {
-              Authorization: `Bearer ${refreshToken}`
-            }
-          }
-        )
+        // ✅ Store both access & refresh token for rotation
+        await storeToken(newAccessToken, newRefreshToken);
 
-        const newAccessToken = res.data.data.accessToken
-
-        // 🔹 store new access token
-        await storeToken(newAccessToken, refreshToken)
-
-        // 🔹 retry original request
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
-
-        return axiosInstance(originalRequest)
+        // Update the request headers with new access token
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        return axiosInstance(originalRequest);
 
       } catch (err) {
-
-        // 🔹 logout user if refresh fails
-        await removeTokens()
-
-        return Promise.reject(err)
+        // Clear tokens on failure and redirect to login
+        await removeTokens();
+        return Promise.reject(err);
       }
     }
 
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
-)
+);
 
 export default axiosInstance

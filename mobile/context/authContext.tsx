@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }: any) => {
  const loadUser = async () => {
   try {
     const tokens = await getTokens();
-    
+
     if (tokens.accessToken) {
       const profile = await getMyProfile();
       setUser(profile);
