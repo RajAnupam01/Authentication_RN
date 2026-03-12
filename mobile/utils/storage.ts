@@ -1,26 +1,20 @@
-import * as SecureStore from "expo-secure-store";
+import * as SecureStore from 'expo-secure-store'
 
-export const saveAuthData = async (accessToken:string, refreshToken:string, user:any) => {
-  await SecureStore.setItemAsync("accessToken", accessToken);
-  await SecureStore.setItemAsync("refreshToken", refreshToken);
-  await SecureStore.setItemAsync("cachedUser", JSON.stringify(user));
-};
+const ACCESS_TOKEN_KEY = 'accessToken'
+const REFRESH_TOKEN_KEY = 'refreshToken'
 
-export const getAccessToken = async () => {
-  return await SecureStore.getItemAsync("accessToken");
-};
+export const storeToken = async (accessToken:string,refreshToken:string) =>{
+  await SecureStore.setItemAsync(ACCESS_TOKEN_KEY,accessToken);
+  await SecureStore.setItemAsync(REFRESH_TOKEN_KEY,refreshToken);
+}
 
-export const getRefreshToken = async () => {
-  return await SecureStore.getItemAsync("refreshToken");
-};
+export const getTokens = async() => {
+  const accessToken = await SecureStore.getItemAsync(ACCESS_TOKEN_KEY);
+  const refreshToken = await SecureStore.getItemAsync(REFRESH_TOKEN_KEY);
+  return {accessToken,refreshToken}
+}
 
-export const getCachedUser = async () => {
-  const user = await SecureStore.getItemAsync("cachedUser");
-  return user ? JSON.parse(user) : null;
-};
-
-export const clearAuthData = async () => {
-  await SecureStore.deleteItemAsync("accessToken");
-  await SecureStore.deleteItemAsync("refreshToken");
-  await SecureStore.deleteItemAsync("cachedUser");
-};
+export const removeTokens = async()=>{
+  await SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY);
+  await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
+}

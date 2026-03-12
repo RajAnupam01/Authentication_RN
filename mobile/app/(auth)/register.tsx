@@ -11,8 +11,8 @@ import { Link } from 'expo-router'
 import { useContext } from "react"
 import { router } from "expo-router"
 import { AuthContext } from '@/context/authContext'
-import { saveAuthData } from '@/utils/storage'
 import { RegisterUser } from '@/services/authApi'
+import { getTokens } from '@/utils/storage'
 
 
 
@@ -36,7 +36,7 @@ const Register = () => {
     }
     try {
       setLoading(true)
-      const response = await RegisterUser({
+      const res = await RegisterUser({
         name,
         email,
         password,
@@ -46,15 +46,17 @@ const Register = () => {
         state: state || null,
         phone: phone || null
       })
-      const { user, accessToken, refreshToken } = response.data.data
-      const message = response.data.message
-      await saveAuthData(accessToken, refreshToken, user)
-      setUser(user)
-      alert(message)
+      setUser(res.data.user)
+      alert(res.message)
       router.replace("/(tabs)")
 
     } catch (error: any) {
-      const message = error?.response?.data?.message || "Registration failed"
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Registration failed";
+
+      alert(message);
 
     } finally {
       setLoading(false)

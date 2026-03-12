@@ -1,8 +1,11 @@
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import InputBox from '@/components/InputBox'
 import Screen from '@/components/Screent'
 import { Link } from "expo-router";
+import { AuthContext } from '@/context/authContext';
+import { router } from "expo-router"
+import { LoginUser } from '@/services/authApi';
 
 const Login = () => {
 
@@ -10,8 +13,34 @@ const Login = () => {
   const [password, setPassword] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
 
-  const handleLogin = () => {
+  const { setUser } = useContext(AuthContext);
 
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      alert("Email and Password are requried.")
+      return
+    }
+    try {
+      setLoading(true)
+      const res = await LoginUser({
+        email,
+        password
+      })
+      setUser(res.data.user)
+      alert(res.message)
+      router.replace("/(tabs)")
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Login failed";
+
+      alert(message);
+
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -47,7 +76,7 @@ const Login = () => {
 
         </View>
         <TouchableOpacity style={styles.submitbtn} onPress={handleLogin} >
-          <Text style={styles.registertxt} >Login</Text>
+          <Text style={styles.registertxt} >{loading ? "wait..." : "Login"}</Text>
         </TouchableOpacity>
         <Link href="/register" style={styles.btmtxt}  >Don't have an account ?<Text style={{ color: '#068ad1', fontWeight: '700' }}> Sign Up</Text>
         </Link>

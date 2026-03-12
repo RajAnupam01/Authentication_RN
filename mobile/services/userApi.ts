@@ -1,6 +1,6 @@
 import API from "./api";
 
 export const getMyProfile = async () => {
-  
-  return API.get("/user/me");
+  const res = await API.get("/user/me");
+  return res.data.data
 };
