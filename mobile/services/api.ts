@@ -1,7 +1,7 @@
 import { getTokens, removeTokens, storeToken } from "@/utils/storage"
 import axios from "axios"
 
-const BASE_URL = "http://10.192.15.197:3000/api"
+const BASE_URL = "http://10.227.86.197:3000/api"
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL
