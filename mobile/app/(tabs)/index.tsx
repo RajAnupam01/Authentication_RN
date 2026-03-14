@@ -1,17 +1,34 @@
-import { Image, StyleSheet, Text, View } from 'react-native'
-import React, { useContext } from 'react'
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React, { useContext, useState } from 'react'
 import Screen from '@/components/Screent'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5'
 import { AuthContext } from '@/context/authContext'
 import Box from '@/components/Box'
+import ProfileModal from '@/components/ProfileModal'
+import { Alert } from 'react-native'
+import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
+import { router } from "expo-router"
 
 const Index = () => {
 
-  const { user } = useContext(AuthContext)
+  const { user,logout } = useContext(AuthContext)
 
   const title = user?.gender === "female" ? "Miss" : "Mr"
 
+  const [isModalOpen, setModalOpen] = useState(false)
+
+  const openProfileModal = () =>{
+    setModalOpen(true)
+  }
+
+  const openMsg = () =>{
+    Alert.alert("This feature is coming soon.")
+  }
+
+    const handleLogout = async () => {
+      await logout()
+      router.replace("/(auth)/login")
+    }
   return (
     <Screen>
       <View style={styles.container}>
@@ -22,7 +39,9 @@ const Index = () => {
 
           <View style={styles.headerIcon}>
             <FontAwesome name="bell-o" size={22} color="white" />
-            <FontAwesome5 name="trophy" size={22} color="white" />
+           <TouchableOpacity onPress={handleLogout} >
+            <SimpleLineIcons name="logout" size={24} color="white" />
+           </TouchableOpacity>
           </View>
         </View>
 
@@ -42,7 +61,7 @@ const Index = () => {
             ) : (
               <View style={styles.avatarPlaceholder}>
                 <Text style={styles.avatarLetter}>
-                  {user?.name?.charAt(0).toUpperCase()}
+                  {user?.name?.charAt(0).toUpperCase() || "U"}
                 </Text>
               </View>
             )}
@@ -78,7 +97,9 @@ const Index = () => {
             size={28}
             title="My Profile"
             subtitle="View and edit profile"
+            onPress = {openProfileModal}
             />
+            <ProfileModal visible={isModalOpen} onclose={()=>setModalOpen(false)} user={user} />
 
 
             <Box
@@ -88,6 +109,7 @@ const Index = () => {
             size={28}
             title="Notifications"
             subtitle="Check the latest update"
+            onPress={openMsg}
             />
 
             <Box
@@ -97,6 +119,7 @@ const Index = () => {
             size={28}
             title="Explore"
             subtitle="Discover the new"
+            onPress={openMsg}
             />
 
 

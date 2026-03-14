@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import Entypo from '@expo/vector-icons/Entypo'
 
@@ -8,12 +8,13 @@ type Boxitem = {
   icon: string,
   iconLib: React.ElementType,
   title: string,
-  subtitle: string
+  subtitle: string,
+  onPress?:()=> void
 }
 
-const Box = ({ size, color, icon, iconLib: IconLib, title, subtitle }: Boxitem) => {
+const Box = ({ size, color, icon, iconLib: IconLib, title, subtitle,onPress }: Boxitem) => {
   return (
-    <View style={styles.box}>
+    <TouchableOpacity style={styles.box} onPress={onPress} >
       <View style={styles.subBox}>
         
         <IconLib name={icon} size={size} color={color} />
@@ -25,7 +26,7 @@ const Box = ({ size, color, icon, iconLib: IconLib, title, subtitle }: Boxitem) 
       </View>
 
       <Entypo name="chevron-right" size={22} color="gray" />
-    </View>
+    </TouchableOpacity>
   )
 }
 

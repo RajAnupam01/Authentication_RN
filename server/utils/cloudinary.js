@@ -31,3 +31,12 @@ export const uploadImageToCloudinary = (buffer, folder='myauth') =>{
     })
 }
 
+export const deleteImageFromCloudinary = async(publicId) =>{
+    try {
+        return await cloudinary.uploader.destroy(publicId);
+    } catch (error) {
+        console.error("Cloudinary Image Destroy Error:",error.message,error.stack)
+        throw new ApiError(500,"failed to destroy image from cloudinary.")
+    }
+}
+
