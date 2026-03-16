@@ -167,3 +167,4 @@ CLOUDINARY_API_SECRET=your_api_secret
 Built as a learning project for learning React Native Expo , Authentication, Full stack Implemention etc.
 
 Made with ❤️ by **Anupam Raj**
+https://github.com/user-attachments/assets/70ad9fbe-7e9f-475c-b836-06f286c31087
