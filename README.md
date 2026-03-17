@@ -59,6 +59,7 @@ This project is designed as a learning project for **full-stack authentication, 
 ---
 
 ## Frontend Folder Structure
+```
 /frontend
 ├── auth
 │ ├── login.tsx
@@ -109,7 +110,7 @@ This project is designed as a learning project for **full-stack authentication, 
 ├── app.js
 └── server.js
 
-
+```
 ---
 
 ## Installation
@@ -128,16 +129,17 @@ expo start
 ```
 
 ## Crate a .env file
-PORT=3000
-MONGO_URI=your_mongodb_uri
-ACCESS_TOKEN_SECRET=your_access_token_secret
-ACCESS_TOKEN_EXPIRY=15m
-REFRESH_TOKEN_SECRET=your_refresh_token_secret
-REFRESH_TOKEN_EXPIRY=7d
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-
+```
+ PORT=3000
+ MONGO_URI=your_mongodb_uri
+ ACCESS_TOKEN_SECRET=your_access_token_secret
+ ACCESS_TOKEN_EXPIRY=15m
+ REFRESH_TOKEN_SECRET=your_refresh_token_secret
+ REFRESH_TOKEN_EXPIRY=7d
+ CLOUDINARY_CLOUD_NAME=your_cloud_name
+ CLOUDINARY_API_KEY=your_api_key
+ CLOUDINARY_API_SECRET=your_api_secret
+```
 
 ## Authentication
 | Method | Endpoint                            | Description                              |

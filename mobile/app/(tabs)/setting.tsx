@@ -1,32 +1,46 @@
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useContext, useState } from 'react'
-import Screen from '@/components/Screent'
-import { AuthContext } from '@/context/authContext'
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import Screen from "@/components/Screent";
+import { AuthContext } from "@/context/authContext";
 
-import InputBox from '@/components/InputBox'
-import SelectBox from '@/components/SelectBox'
-import DatePicker from '@/components/DatePicker'
-import RadioGroup from '@/components/RadioGroup'
-import { countryOptions, stateOptions } from '@/constants/locationOptions'
-import { Ionicons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
-import { UpdateUser } from '@/services/authApi'
-import { router } from "expo-router"
+import InputBox from "@/components/InputBox";
+import SelectBox from "@/components/SelectBox";
+import DatePicker from "@/components/DatePicker";
+import RadioGroup from "@/components/RadioGroup";
+import { countryOptions, stateOptions } from "@/constants/locationOptions";
+import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+import { UpdateUser } from "@/services/authApi";
+import { router } from "expo-router";
 
 const Setting = () => {
+  const { user, setUser } = useContext(AuthContext);
 
-  const { user, setUser, } = useContext(AuthContext)
+  // Prevent crash if user is null
+  if (!user) return null;
 
-  const [name, setName] = useState<string>(user.name)
-  const [email, setEmail] = useState<string>(user.email)
-  const [gender, setGender] = useState<string>(user.gender)
-  const [dateOfBirth, setDateOfBirth] = useState<string>(user.dateOfBirth || "")
-  const [country, setCountry] = useState<string>(user.country || "")
-  const [state, setState] = useState<string>(user.state || "")
-  const [phone, setPhone] = useState<string>(user.phone || "")
-  const [loading, setLoading] = useState<boolean>(false)
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [gender, setGender] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [country, setCountry] = useState("");
+  const [state, setState] = useState("");
+  const [phone, setPhone] = useState("");
   const [avatar, setAvatar] = useState<any>(null);
-  
+  const [loading, setLoading] = useState(false);
+
+  // Sync form state when user loads
+  useEffect(() => {
+    if (user) {
+      setName(user.name || "");
+      setEmail(user.email || "");
+      setGender(user.gender || "");
+      setDateOfBirth(user.dateOfBirth || "");
+      setCountry(user.country || "");
+      setState(user.state || "");
+      setPhone(user.phone || "");
+    }
+  }, [user]);
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -45,38 +59,40 @@ const Setting = () => {
       name !== user.name ||
       email !== user.email ||
       gender !== user.gender ||
-      dateOfBirth !== user.dateOfBirth ||
+      dateOfBirth !== (user.dateOfBirth || "") ||
       country !== (user.country || "") ||
       state !== (user.state || "") ||
       phone !== (user.phone || "") ||
       avatar !== null
-    )
-  }
-
-
+    );
+  };
 
   const handleUpdate = async () => {
     if (!hasChanges()) {
       alert("No changes to update!");
-      return; 
+      return;
     }
 
     try {
-      setLoading(true)
-      const res = await UpdateUser({
-        name,
-        email,
-        gender,
-        dateOfBirth,
-        country,
-        state,
-        phone
-      }, avatar)
+      setLoading(true);
 
-      setUser(res.data)
-      alert(res.message)
-      router.replace("/(tabs)")
+      const res = await UpdateUser(
+        {
+          name,
+          email,
+          gender,
+          dateOfBirth,
+          country,
+          state,
+          phone,
+        },
+        avatar
+      );
 
+      setUser(res.data);
+      alert(res.message);
+
+      router.replace("/(tabs)");
     } catch (error: any) {
       const message =
         error?.response?.data?.message ||
@@ -84,12 +100,10 @@ const Setting = () => {
         "Update failed";
 
       alert(message);
-
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
-
+  };
 
   return (
     <Screen>
@@ -97,19 +111,12 @@ const Setting = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.container}
       >
-
         <View style={styles.header}>
           <Text style={styles.title}>Update Your Profile</Text>
-
         </View>
 
         <View style={styles.form}>
-
-          <InputBox
-            placeholder="Full Name"
-            value={name}
-            setValue={setName}
-          />
+          <InputBox placeholder="Full Name" value={name} setValue={setName} />
 
           <InputBox
             placeholder="Email Address"
@@ -120,27 +127,21 @@ const Setting = () => {
 
           <View style={styles.section}>
             <Text style={styles.label}>Gender</Text>
-            <View style={styles.field} >
-              <RadioGroup
-                value={gender}
-                setValue={setGender}
-              />
+            <View style={styles.field}>
+              <RadioGroup value={gender} setValue={setGender} />
             </View>
           </View>
 
           <View style={styles.section}>
             <Text style={styles.label}>Date of Birth</Text>
-            <View style={styles.field} >
-              <DatePicker
-                value={dateOfBirth}
-                setValue={setDateOfBirth}
-              />
+            <View style={styles.field}>
+              <DatePicker value={dateOfBirth} setValue={setDateOfBirth} />
             </View>
           </View>
 
           <View style={styles.section}>
             <Text style={styles.label}>Country</Text>
-            <View style={styles.field} >
+            <View style={styles.field}>
               <SelectBox
                 value={country}
                 setValue={setCountry}
@@ -151,7 +152,7 @@ const Setting = () => {
 
           <View style={styles.section}>
             <Text style={styles.label}>State</Text>
-            <View style={styles.field} >
+            <View style={styles.field}>
               <SelectBox
                 value={state}
                 setValue={setState}
@@ -165,29 +166,34 @@ const Setting = () => {
             keyboardType="phone-pad"
             value={phone}
             setValue={(text) => {
-              const cleaned = text.replace(/[^0-9]/g, '')
-              setPhone(cleaned)
+              const cleaned = text.replace(/[^0-9]/g, "");
+              setPhone(cleaned);
             }}
           />
-
         </View>
-        <TouchableOpacity
-          style={styles.uploadBtn} onPress={pickImage} >
+
+        <TouchableOpacity style={styles.uploadBtn} onPress={pickImage}>
           <Ionicons name="camera-outline" size={20} color="#fff" />
-          <Text style={styles.uploadBtnText}>{avatar ? "attached.." : "update avatar"}</Text>
+          <Text style={styles.uploadBtnText}>
+            {avatar ? "attached.." : "update avatar"}
+          </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.submitbtn,!hasChanges() && {opacity:0.5}]} onPress={handleUpdate} disabled={!hasChanges} >
-          <Text style={styles.registertxt} >{loading ? "wait..." : 'Update'}</Text>
+        <TouchableOpacity
+          style={[styles.submitbtn, !hasChanges() && { opacity: 0.5 }]}
+          onPress={handleUpdate}
+          disabled={!hasChanges()}
+        >
+          <Text style={styles.registertxt}>
+            {loading ? "wait..." : "Update"}
+          </Text>
         </TouchableOpacity>
-
       </ScrollView>
-
     </Screen>
-  )
-}
+  );
+};
 
-export default Setting
+export default Setting;
 
 const styles = StyleSheet.create({
   container: {
